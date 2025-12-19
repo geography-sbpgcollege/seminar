@@ -314,6 +314,111 @@
             .card-btn { width: 100%; margin-bottom: 20px; }
             .logos { gap: 10px; }
         }
+        /* --- Registration Fee Section --- */
+.fee-title {
+    text-align: center;
+    color: var(--navy);
+    margin: 40px 0 20px 0;
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+/* The "On the Spot" Alert Box */
+.spot-payment-note {
+    background-color: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeeba;
+    padding: 15px;
+    border-radius: 8px;
+    text-align: center;
+    margin-bottom: 30px;
+    font-weight: bold;
+    animation: pulse 3s infinite;
+}
+
+.fee-container {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap; /* Stacks on mobile */
+}
+
+.fee-card {
+    background: white;
+    border: 1px solid #eee;
+    border-radius: 12px;
+    padding: 25px;
+    text-align: center;
+    width: 220px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    transition: transform 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.fee-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+}
+
+.fee-amount {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: var(--dark-text);
+    margin: 10px 0;
+}
+
+.fee-category {
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #666;
+}
+
+/* Specific Top Borders for Visual Hierarchy */
+.card-faculty { border-top: 6px solid var(--navy); }
+.card-scholar { border-top: 6px solid var(--saffron); }
+.card-student { border-top: 6px solid var(--green); }
+        /* --- Fee Inclusions & Logistics Notes --- */
+.logistics-box {
+    background-color: #f8f9fa;
+    border-left: 5px solid var(--navy); /* Matches theme */
+    padding: 20px;
+    margin-top: 30px;
+    border-radius: 0 8px 8px 0;
+    font-size: 0.95rem;
+}
+
+.logistics-box ul {
+    list-style: none;
+    padding-left: 0;
+    margin-bottom: 15px;
+}
+
+.logistics-box li {
+    margin-bottom: 10px;
+    display: flex;
+    align-items: flex-start;
+}
+
+.logistics-icon {
+    margin-right: 10px;
+    color: var(--green); /* Green checkmarks */
+    font-weight: bold;
+}
+
+.ta-da-note {
+    font-style: italic;
+    color: #555;
+    border-top: 1px solid #ddd;
+    padding-top: 10px;
+    margin-top: 10px;
+}
+
+.highlight-red {
+    color: #c0392b;
+    font-weight: 600;
+}
     </style>
 </head>
 <body>
@@ -398,6 +503,49 @@
     <li>10. Policy, Governance, and Geographical Insights</li>
     <li>11. Any other sub-theme relevant to the theme of the seminar</li>
 </ul>
+                <br>
+                <br>
+                <h3 class="fee-title">Registration Fees</h3>
+
+<div class="spot-payment-note">
+    ⚠️ Important: Registration fees must be submitted ON THE SPOT at the venue desk.
+</div>
+
+<div class="fee-container">
+    
+    <div class="fee-card card-faculty">
+        <div class="fee-category">Faculty & Academicians</div>
+        <div class="fee-amount">₹ 1,000</div>
+    </div>
+
+    <div class="fee-card card-scholar">
+        <div class="fee-category">Research Scholars</div>
+        <div class="fee-amount">₹ 700</div>
+    </div>
+
+    <div class="fee-card card-student">
+        <div class="fee-category">Students</div>
+        <div class="fee-amount">₹ 500</div>
+    </div>
+    <div class="logistics-box">
+    <ul>
+        <li>
+            <span class="logistics-icon">✔</span> 
+            <strong>Fee Includes:</strong>&nbsp; Seminar kit, lunch, and high tea for both days.
+        </li>
+        <li>
+            <span class="logistics-icon">ℹ</span> 
+            <strong>Accommodation:</strong>&nbsp; Not included in the fee. However, accommodation can be arranged upon specific request by participants.
+        </li>
+    </ul>
+
+    <div class="ta-da-note">
+        <strong>T.A./D.A. Provision:</strong> <br>
+        Travel Allowance / Dearness Allowance will be provided as per Government rules to a <span class="highlight-red">limited number of paper presenters</span>.
+    </div>
+</div>
+
+</div>
                 <hr style="margin: 20px 0; border: 0; border-top: 1px solid #ddd;">
                 <h4 style="color: var(--saffron);">Convener</h4>
                 <p>Dr. Uma Kant Singh (+91 7985063863)</p>
