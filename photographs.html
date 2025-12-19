@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gallery - Viksit Bharat @2047</title>
+    <style>
+        :root {
+            --saffron: #FF9933;
+            --white: #FFFFFF;
+            --green: #138808;
+            --navy: #000080;
+            --bg-gray: #f4f7f6;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-gray);
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideDown {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        /* --- Header --- */
+        header {
+            background: var(--navy);
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 4px solid var(--saffron);
+        }
+
+        .header-title {
+            font-size: 1.5rem;
+            animation: slideDown 0.5s ease-out;
+        }
+
+        .back-btn {
+            background: var(--saffron);
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: bold;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+
+        .back-btn:hover {
+            background: white;
+            color: var(--saffron);
+            border-color: var(--saffron);
+            transform: scale(1.05);
+        }
+
+        /* --- Gallery Grid --- */
+        .container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .gallery-intro {
+            text-align: center;
+            margin-bottom: 40px;
+            color: #555;
+        }
+
+        /* Responsive Grid */
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .gallery-item {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            cursor: pointer;
+            height: 250px; /* Fixed height for uniformity */
+        }
+
+        .gallery-item:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+        }
+
+        /* Image styling */
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .gallery-item:hover img {
+            transform: scale(1.1);
+        }
+
+        /* Overlay text on hover */
+        .overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 128, 0.8); /* Navy see-through */
+            color: white;
+            padding: 15px;
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
+            text-align: center;
+        }
+
+        .gallery-item:hover .overlay {
+            transform: translateY(0);
+        }
+
+        /* --- Footer --- */
+        footer {
+            text-align: center;
+            padding: 30px;
+            margin-top: 50px;
+            background: #e9ecef;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-title">📸 Event Gallery</div>
+        <a href="index.html" class="back-btn">← Back to Home</a>
+    </header>
+
+    <div class="container">
+        <div class="gallery-intro">
+            <h1 style="color: var(--navy); margin-bottom: 10px;">Glimpses of the Seminar</h1>
+            <p>Highlights from the event, venue preparation, and previous gatherings.</p>
+        </div>
+
+        <div class="gallery-grid">
+            
+            <div class="gallery-item">
+                <img src="https://via.placeholder.com/400x300?text=Inauguration+Ceremony" alt="Inauguration">
+                <div class="overlay">Inauguration Ceremony</div>
+            </div>
+
+            <div class="gallery-item">
+                <img src="https://via.placeholder.com/400x300/FF9933/FFFFFF?text=Keynote+Speaker" alt="Speaker">
+                <div class="overlay">Keynote Address</div>
+            </div>
+
+            <div class="gallery-item">
+                <img src="https://via.placeholder.com/400x300/138808/FFFFFF?text=Campus+View" alt="Campus">
+                <div class="overlay">Shri Baldeo P.G. College Campus</div>
+            </div>
+
+            <div class="gallery-item">
+                <img src="https://via.placeholder.com/400x300?text=Audience" alt="Audience">
+                <div class="overlay">Participant Interaction</div>
+            </div>
+
+            <div class="gallery-item">
+                <img src="https://via.placeholder.com/400x300/000080/FFFFFF?text=Technical+Session" alt="Session">
+                <div class="overlay">Technical Session</div>
+            </div>
+
+            <div class="gallery-item">
+                <img src="https://via.placeholder.com/400x300?text=Award+Distribution" alt="Awards">
+                <div class="overlay">Valedictory & Awards</div>
+            </div>
+
+        </div>
+    </div>
+
+    <footer>
+        <p>Viksit Bharat @2047 | Department of Geography</p>
+    </footer>
+
+</body>
+</html>
