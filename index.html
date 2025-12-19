@@ -30,6 +30,40 @@
             background-color: var(--light-bg);
             overflow-x: hidden; /* Prevent horizontal scroll */
         }
+        /* --- Sub-Theme List Styling --- */
+.sub-themes-title {
+    color: var(--navy);
+    border-bottom: 2px solid var(--saffron);
+    display: inline-block;
+    margin: 30px 0 20px 0;
+    padding-bottom: 5px;
+}
+
+.theme-list {
+    list-style: none; /* Remove default bullets */
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* Auto 2 columns */
+    gap: 15px;
+}
+
+.theme-list li {
+    background: #fdfdfd;
+    padding: 15px;
+    border-radius: 8px;
+    border-left: 5px solid var(--navy);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    transition: all 0.3s ease;
+    font-size: 0.95rem;
+}
+
+/* Hover effect for interactivity */
+.theme-list li:hover {
+    transform: translateX(10px); /* Slides slightly right */
+    border-left-color: var(--saffron); /* Changes color on hover */
+    background: white;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
 
         /* --- ANIMATIONS --- */
         @keyframes gradientFlow {
@@ -350,6 +384,20 @@
                 <p style="margin-top: 15px; line-height: 1.8;">
                     This multidisciplinary national seminar explores the spatial dimensions of Human Resource Development (HRD). We are gathering scholars, policymakers, and geographers to discuss location-specific strategies in education, health, and skill development to contribute to the vision of a <strong>"Viksit Bharat @2047"</strong>.
                 </p>
+                <h3 class="sub-themes-title">Seminar Sub-Themes</h3>
+<ul class="theme-list">
+    <li>1. Spatial Dimensions of Education and Skill Development</li>
+    <li>2. Geographies of Health, Wellness, and Nutrition</li>
+    <li>3. Migration, Mobility, and Human Capital</li>
+    <li>4. Gender, Social Inclusion, and Regional Development</li>
+    <li>5. Environmental Sustainability, Climate Change, and Human Well-being</li>
+    <li>6. Urbanisation, Smart Cities, and Quality of Life</li>
+    <li>7. Rural Development, Agrarian Change, and Livelihood Security</li>
+    <li>8. Geospatial Technologies in Human Resource Planning and Management</li>
+    <li>9. Geopolitics, Borders, and Human Security</li>
+    <li>10. Policy, Governance, and Geographical Insights</li>
+    <li>11. Any other sub-theme relevant to the theme of the seminar</li>
+</ul>
                 <hr style="margin: 20px 0; border: 0; border-top: 1px solid #ddd;">
                 <h4 style="color: var(--saffron);">Convener</h4>
                 <p>Dr. Uma Kant Singh (+91 7985063863)</p>
