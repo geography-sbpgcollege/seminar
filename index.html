@@ -556,97 +556,124 @@ input:checked + .slider:before { transform: translateX(26px); }
         <p style="font-size: 0.85rem; color: #ddd;">Technical Support: <a href="mailto:seminar@mygeography.us.kg">seminar@mygeography.us.kg</a></p>
         <p style="font-size: 0.85rem; margin-top: 5px; color: #bbb;">Made and designed by Shaurya Singh</p> 
     </footer>
+<script>
+    // --- 1. ROBUST POPUP LOGIC (Fixed) ---
+    document.addEventListener("DOMContentLoaded", function() {
+        // Wait 1 second, then force the popup to show
+        setTimeout(function() {
+            var modal = document.getElementById('welcomeModal');
+            if (modal) {
+                // We change CSS directly to force it to show
+                modal.style.visibility = "visible";
+                modal.style.opacity = "1";
+            }
+        }, 1000);
+    });
 
-    <script>
-        function switchTheme(e) {
-    if (e.checked) {
-        document.documentElement.setAttribute('data-theme', 'dark');
-    } else {
-        document.documentElement.setAttribute('data-theme', 'light');
+    function closePopup() {
+        var modal = document.getElementById('welcomeModal');
+        if (modal) {
+            // Fade out
+            modal.style.opacity = "0";
+            // Hide completely after fade finishes
+            setTimeout(function() {
+                modal.style.visibility = "hidden";
+                modal.style.display = "none"; 
+            }, 500);
+        }
     }
-}
-        // --- 1. Scroll Progress Bar ---
-        window.onscroll = function() {
-            // Progress Bar
-            var winScroll = document.body.scrollTop || document.documentElement.scrollTop;
-            var height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-            var scrolled = (winScroll / height) * 100;
-            document.getElementById("myBar").style.width = scrolled + "%";
 
-            // Back to Top Button visibility
-            var topBtn = document.getElementById("backToTop");
+    // --- 2. Dark Mode Logic ---
+    function switchTheme(e) {
+        if (e.checked) {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        } else {
+            document.documentElement.setAttribute('data-theme', 'light');
+        }
+    }
+
+    // --- 3. Scroll Progress & Animations ---
+    window.onscroll = function() {
+        // Progress Bar
+        var winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+        var height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+        var scrolled = (winScroll / height) * 100;
+        var bar = document.getElementById("myBar");
+        if(bar) bar.style.width = scrolled + "%";
+
+        // Back to Top Button
+        var topBtn = document.getElementById("backToTop");
+        if (topBtn) {
             if (document.body.scrollTop > 300 || document.documentElement.scrollTop > 300) {
                 topBtn.classList.add("visible");
             } else {
                 topBtn.classList.remove("visible");
             }
-        };
+        }
 
-        // --- 2. Scroll Animation (Intersection Observer) ---
-        function reveal() {
-            var reveals = document.querySelectorAll(".reveal");
-            for (var i = 0; i < reveals.length; i++) {
-                var windowHeight = window.innerHeight;
-                var elementTop = reveals[i].getBoundingClientRect().top;
-                var elementVisible = 150;
-                if (elementTop < windowHeight - elementVisible) {
-                    reveals[i].classList.add("active");
-                }
+        // Reveal Animation
+        var reveals = document.querySelectorAll(".reveal");
+        for (var i = 0; i < reveals.length; i++) {
+            var windowHeight = window.innerHeight;
+            var elementTop = reveals[i].getBoundingClientRect().top;
+            var elementVisible = 100;
+            if (elementTop < windowHeight - elementVisible) {
+                reveals[i].classList.add("active");
             }
         }
-        window.addEventListener("scroll", reveal);
+    };
 
-        // --- 3. About Section Toggle ---
-        function toggleAbout() {
-            var section = document.getElementById("about-section");
-            if (section.style.display === "none" || section.style.display === "") {
-                section.style.display = "block";
-                section.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            } else {
-                section.style.display = "none";
-            }
+    // --- 4. Utilities ---
+    function toggleAbout() {
+        var section = document.getElementById("about-section");
+        if (section.style.display === "none" || section.style.display === "") {
+            section.style.display = "block";
+            section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        } else {
+            section.style.display = "none";
         }
+    }
 
-        // --- 4. Maintenance Message Alert ---
-        function showMaintenance(featureName) {
-            alert("⚠️ SYSTEM MAINTENANCE ALERT \n\nThe " + featureName + " feature is currently being updated.\n\nPlease check back shortly.");
-        }
+    function showMaintenance(featureName) {
+        alert("⚠️ SYSTEM MAINTENANCE ALERT \n\nThe " + featureName + " feature is currently being updated.\n\nPlease check back shortly.");
+    }
 
-        // --- 5. Welcome Popup Logic ---
-        window.onload = function() {
-            setTimeout(function() {
-                document.body.classList.add('show-modal');
-            }, 800);
-        };
-        function closePopup() {
-            document.body.classList.remove('show-modal');
-            setTimeout(() => {
-                document.getElementById('welcomeModal').style.display = 'none';
-            }, 500);
-        }
+    function downloadICS() {
+        const icsContent = `BEGIN:VCALENDAR\nVERSION:2.0\nBEGIN:VEVENT\nURL:https://seminar.mygeography.us.kg/\nDTSTART:20260221T090000Z\nDTEND:20260222T170000Z\nSUMMARY:National Seminar: Viksit Bharat @2047\nLOCATION:Shri Baldeo P. G. College, Varanasi\nEND:VEVENT\nEND:VCALENDAR`;
+        const blob = new Blob([icsContent], { type: 'text/calendar' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'seminar.ics';
+        a.click();
+    }
 
-        // --- 6. Countdown Timer Logic ---
-        var countDownDate = new Date("Feb 21, 2026 09:00:00").getTime();
-        var x = setInterval(function() {
-            var now = new Date().getTime();
-            var distance = countDownDate - now;
-            var days = Math.floor(distance / (1000 * 60 * 60 * 24));
-            var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-            var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+    // --- 5. Visitor Counter Simulation ---
+    var count = localStorage.getItem('visitCount') || 124;
+    count = parseInt(count) + Math.floor(Math.random() * 3);
+    localStorage.setItem('visitCount', count);
+    var countEl = document.getElementById('visit-count');
+    if(countEl) countEl.innerText = count;
 
-            document.getElementById("days").innerHTML = days < 10 ? "0" + days : days;
+    // --- 6. Countdown Timer ---
+    var countDownDate = new Date("Feb 21, 2026 09:00:00").getTime();
+    var x = setInterval(function() {
+        var now = new Date().getTime();
+        var distance = countDownDate - now;
+        var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+        var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+        var dEl = document.getElementById("days");
+        if(dEl) {
+            dEl.innerHTML = days < 10 ? "0" + days : days;
             document.getElementById("hours").innerHTML = hours < 10 ? "0" + hours : hours;
             document.getElementById("minutes").innerHTML = minutes < 10 ? "0" + minutes : minutes;
             document.getElementById("seconds").innerHTML = seconds < 10 ? "0" + seconds : seconds;
-
-            if (distance < 0) {
-                clearInterval(x);
-                document.querySelector(".countdown-container").innerHTML = "<h2 style='color:var(--navy)'>The Seminar Has Begun!</h2>";
-            }
-        }, 1000);
-    </script>
-    
+        }
+    }, 1000);
+</script>
 <script type='text/javascript' src='https://www.freevisitorcounters.com/auth.php?id=aebf4adc0e3f8165132ed49a1845d9f4a0d79b7a'></script>
 <script type="text/javascript" src="https://www.freevisitorcounters.com/en/home/counter/1464679/t/2"></script>
 </body>
