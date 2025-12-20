@@ -9,6 +9,7 @@
     <meta property="og:title" content="National Seminar: Viksit Bharat @2047">
     <meta property="og:description" content="Join us for the National Seminar on 'Contribution of Geography to Progress in HRD'. Sponsored by ICSSR, New Delhi. Feb 21-22, 2026.">
     <meta property="og:image" content="https://seminar.mygeography.us.kg/banner-image.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <title>National Seminar: Viksit Bharat @2047</title>
     
@@ -299,13 +300,72 @@
             .logo-img { width: 70px; height: 70px; }
             .card-btn { width: 100%; }
         }
+        /* --- DARK MODE VARIABLES --- */
+[data-theme="dark"] {
+    --light-bg: #121212;
+    --navy: #4d94ff; /* Lighter blue for visibility */
+    --white: #1e1e1e;
+    --text-color: #f0f0f0;
+    color: #f0f0f0;
+}
+[data-theme="dark"] .card-btn, [data-theme="dark"] .modal-box, [data-theme="dark"] .faq-item, [data-theme="dark"] .fee-card {
+    background: #1e1e1e;
+    color: #f0f0f0;
+    border-color: #333;
+}
+[data-theme="dark"] .hero-text p, [data-theme="dark"] .faq-item p {
+    color: #bbb;
+}
+
+/* --- TOGGLE SWITCH UI --- */
+.theme-switch-wrapper {
+    position: fixed; top: 20px; right: 20px; z-index: 10001;
+    display: flex; align-items: center;
+}
+.theme-switch {
+    display: inline-block; height: 34px; position: relative; width: 60px;
+}
+.theme-switch input { display: none; }
+.slider {
+    background-color: #ccc; bottom: 0; cursor: pointer; left: 0; position: absolute; right: 0; top: 0; transition: .4s; border-radius: 34px;
+}
+.slider:before {
+    background-color: white; bottom: 4px; content: ""; height: 26px; left: 4px; position: absolute; transition: .4s; width: 26px; border-radius: 50%;
+}
+input:checked + .slider { background-color: var(--navy); }
+input:checked + .slider:before { transform: translateX(26px); }
+
+        .social-sidebar {
+    position: fixed; left: 0; top: 50%; transform: translateY(-50%); z-index: 100;
+    display: flex; flex-direction: column;
+}
+.social-btn {
+    width: 50px; height: 50px; display: flex; align-items: center; justify-content: center;
+    color: white; font-size: 1.2rem; text-decoration: none; transition: 0.3s;
+}
+.social-btn:hover { width: 60px; }
+.sb-wa { background: #25D366; } 
+.sb-fb { background: #3b5998; }
+.sb-li { background: #0077b5; }
     </style>
 </head>
 <body>
-
     <div class="progress-container">
         <div class="progress-bar" id="myBar"></div>
     </div>
+    
+        <div class="theme-switch-wrapper">
+    <label class="theme-switch" for="checkbox">
+        <input type="checkbox" id="checkbox" onclick="switchTheme(this)"/>
+        <div class="slider"></div>
+    </label>
+</div>
+        <div class="social-sidebar">
+    <a href="#" class="social-btn sb-wa"><i class="fab fa-whatsapp"></i></a>
+    <a href="#" class="social-btn sb-fb"><i class="fab fa-facebook-f"></i></a>
+    <a href="#" class="social-btn sb-li"><i class="fab fa-linkedin-in"></i></a>
+</div>
+
 
     <div id="welcomeModal" class="modal-overlay">
         <div class="modal-box">
@@ -364,34 +424,35 @@
             <div class="time-box"><span id="seconds">00</span><small>Secs</small></div>
         </div>
 
-        <div class="button-container reveal">
+<div class="button-container reveal">
             <a href="javascript:void(0)" class="card-btn" onclick="toggleAbout()">
-                <span class="card-icon">🇮🇳</span>
+                <i class="fas fa-info-circle" style="font-size:3rem; color:var(--navy); margin-bottom:10px;"></i>
                 <h3>About Seminar</h3>
-                <p>Themes, Sub-themes & Vision</p>
+                <p>Themes & Vision</p>
             </a>
 
-            <a href="https://forms.gle/vJCxDUDULt8es5fQ9" target="_blank" class="card-btn register-card">
-                <span class="card-icon">📝</span>
+            <a href="https://forms.gle/vJCxDUDULt8es5fQ9" target="_blank" class="card-btn register-card" onclick="alert('Redirecting to Registration...')">
+                <i class="fas fa-file-signature" style="font-size:3rem; color:var(--saffron); margin-bottom:10px;"></i>
                 <h3>Register Now</h3>
                 <p>Fill Form & Submit Abstract</p>
             </a>
 
             <a href="photographs.html" class="card-btn gallery-card">
-                <span class="card-icon">📸</span>
+                <i class="fas fa-images" style="font-size:3rem; color:#6c5ce7; margin-bottom:10px;"></i>
                 <h3>Event Gallery</h3>
-                <p>View Highlights & Photos</p>
+                <p>Highlights & Photos</p>
             </a>
 
             <a href="javascript:void(0)" class="card-btn" onclick="showMaintenance('Certificate Portal')">
-                <span class="card-icon">📜</span>
-                <h3>Download Certificate</h3>
-                <p>Get E-Certificate</p>
+                <i class="fas fa-certificate" style="font-size:3rem; color:var(--green); margin-bottom:10px;"></i>
+                <h3>Certificate</h3>
+                <p>Download Portal</p>
             </a>
         </div>
 
+
         <a href="javascript:void(0)" onclick="showMaintenance('Brochure Download')" class="sticky-download">
-            ⬇ Brochure
+            Download Brochure
         </a>
         <a href="#" class="back-to-top" id="backToTop">↑</a>
 
@@ -458,6 +519,9 @@
                     <strong>T.A./D.A. Provision:</strong> Travel Allowance / Dearness Allowance provided as per Government rules to a <span class="highlight-red">limited number of paper presenters</span>.
                 </div>
             </div>
+            <a href="https://forms.gle/vJCxDUDULt8es5fQ9" class="close-btn">
+    <button>Register Now</button>
+</a>
         </section>
     </div>
 
@@ -575,5 +639,7 @@
             }
         }, 1000);
     </script>
+<script type='text/javascript' src='https://www.freevisitorcounters.com/auth.php?id=aebf4adc0e3f8165132ed49a1845d9f4a0d79b7a'></script>
+<script type="text/javascript" src="https://www.freevisitorcounters.com/en/home/counter/1464679/t/2"></script>
 </body>
 </html>
