@@ -558,6 +558,13 @@ input:checked + .slider:before { transform: translateX(26px); }
     </footer>
 
     <script>
+        function switchTheme(e) {
+    if (e.checked) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+    } else {
+        document.documentElement.setAttribute('data-theme', 'light');
+    }
+}
         // --- 1. Scroll Progress Bar ---
         window.onscroll = function() {
             // Progress Bar
@@ -639,6 +646,7 @@ input:checked + .slider:before { transform: translateX(26px); }
             }
         }, 1000);
     </script>
+    
 <script type='text/javascript' src='https://www.freevisitorcounters.com/auth.php?id=aebf4adc0e3f8165132ed49a1845d9f4a0d79b7a'></script>
 <script type="text/javascript" src="https://www.freevisitorcounters.com/en/home/counter/1464679/t/2"></script>
 </body>
