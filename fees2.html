@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Portal - Fee Collection</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <style>
+        :root {
+            --navy: #000080;
+            --saffron: #FF9933;
+            --white: #ffffff;
+            --light-gray: #f4f7f6;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', sans-serif; }
+        body { background: var(--light-gray); height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
+
+        /* LOGIN */
+        #login-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999;
+            background: linear-gradient(135deg, var(--navy), #000);
+            display: flex; justify-content: center; align-items: center;
+        }
+        .login-box {
+            background: white; padding: 40px; border-radius: 12px; width: 350px; text-align: center;
+            border-top: 6px solid var(--saffron); box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+        }
+        .login-box input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 6px; }
+        .login-box button {
+            width: 100%; padding: 12px; background: var(--navy); color: white; border: none;
+            border-radius: 6px; font-weight: bold; cursor: pointer; transition: 0.3s;
+        }
+
+        /* LAYOUT */
+        #dashboard { display: none; height: 100%; width: 100%; }
+        
+        .sidebar {
+            width: 260px; background: var(--navy); color: white; height: 100%;
+            padding: 20px; position: fixed; left: 0; top: 0; z-index: 1000;
+            transition: transform 0.3s ease;
+        }
+        
+        /* Mobile Sidebar State */
+        .sidebar.closed { transform: translateX(-100%); }
+        .sidebar-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); z-index: 900; display: none;
+        }
+        .sidebar-overlay.active { display: block; }
+
+        .main-content {
+            margin-left: 260px; flex: 1; padding: 20px; overflow-y: auto; height: 100vh; width: calc(100% - 260px); transition: margin-left 0.3s;
+        }
+
+        @media(max-width: 768px) {
+            .sidebar { transform: translateX(-100%); } /* Hidden by default on mobile */
+            .sidebar.active { transform: translateX(0); } /* Show when active */
+            .main-content { margin-left: 0; width: 100%; }
+        }
+
+        .menu-item { padding: 15px; cursor: pointer; border-radius: 8px; margin-bottom: 8px; display: flex; align-items: center; gap: 12px; }
+        .menu-item:hover, .menu-item.active { background: rgba(255,255,255,0.1); border-left: 4px solid var(--saffron); }
+        
+        /* TOP BAR */
+        .top-bar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+        .burger { font-size: 1.5rem; cursor: pointer; color: var(--navy); display: none; }
+        @media(max-width: 768px) { .burger { display: block; } }
+
+        /* TABLES */
+        .table-wrapper { background: white; border-radius: 10px; overflow-x: auto; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        table { width: 100%; border-collapse: collapse; min-width: 600px; }
+        th, td { padding: 15px; text-align: left; border-bottom: 1px solid #eee; }
+        th { background: #f8f9fa; color: #555; }
+        .btn-action { padding: 6px 10px; border-radius: 4px; border: none; cursor: pointer; color: white; margin-right: 5px; }
+        .btn-red { background: #c0392b; }
+        
+        /* SEARCH */
+        .search-bar { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; margin-bottom: 20px; }
+
+        /* LOADER */
+        .loader { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(255,255,255,0.8); z-index:2000; display:none; justify-content:center; align-items:center; }
+        .spinner { width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid var(--navy); border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+    <div id="login-screen">
+        <div class="login-box">
+            <h2 style="color:var(--navy);">Admin Login</h2>
+            <input type="text" id="username" placeholder="Username">
+            <input type="password" id="password" placeholder="Password">
+            <button onclick="handleLogin()">Login</button>
+        </div>
+    </div>
+
+    <div id="dashboard">
+        <div class="sidebar-overlay" onclick="closeSidebar()"></div>
+
+        <div class="sidebar" id="sidebar">
+            <h2 style="margin-bottom:30px;">Admin Panel <span style="float:right; cursor:pointer;" onclick="closeSidebar()" class="burger">×</span></h2>
+            <div class="menu-item active" onclick="showSection('home')"><i class="fas fa-users"></i> Participants</div>
+            <div class="menu-item" onclick="showSection('fee')"><i class="fas fa-wallet"></i> Fee Collection</div>
+            <div class="menu-item" style="margin-top:auto; background:#c0392b;" onclick="location.reload()">Logout</div>
+        </div>
+
+        <div class="main-content">
+            <div class="top-bar">
+                <div class="burger" onclick="openSidebar()"><i class="fas fa-bars"></i></div>
+                <h2 style="color:var(--navy);">Dashboard</h2>
+            </div>
+
+            <div class="loader" id="loader"><div class="spinner"></div></div>
+
+            <div id="home" class="section">
+                <div style="display:flex; gap:10px;">
+                    <input type="text" id="home-search" class="search-bar" placeholder="Search by Name or ID..." onkeyup="searchTable()">
+                    <button onclick="fetchAllData()" style="height:45px; padding:0 20px; background:var(--navy); color:white; border:none; border-radius:6px; cursor:pointer;">Refresh</button>
+                </div>
+                
+                <div class="table-wrapper">
+                    <table id="participants-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Category</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="fee" class="section" style="display:none;">
+                <h3>Fee Collection</h3>
+                <input type="text" id="fee-search" class="search-bar" placeholder="Search user to collect fee..." onkeyup="filterFeeSearch()">
+                <div id="fee-results" style="border:1px solid #ddd; display:none; background:white; max-height:200px; overflow-y:auto; margin-bottom:20px;"></div>
+
+                <div id="fee-form" style="display:none; background:white; padding:20px; border-radius:10px;">
+                    <h4 id="fee-user-name" style="margin-bottom:15px; color:var(--navy);"></h4>
+                    <input type="hidden" id="fee-reg-id">
+                    
+                    <label style="display:block; margin:10px 0;">Category:</label>
+                    <select id="fee-category" onchange="autoFill()" style="width:100%; padding:10px;">
+                        <option value="Faculty/Academicians">Faculty</option>
+                        <option value="Research Scholar">Scholar</option>
+                        <option value="Student">Student</option>
+                    </select>
+
+                    <label style="display:block; margin:10px 0;">Amount (₹):</label>
+                    <input type="number" id="fee-amount" style="width:100%; padding:10px;">
+
+                    <label style="display:block; margin:10px 0;">Mode:</label>
+                    <select id="fee-mode" style="width:100%; padding:10px;">
+                        <option value="Cash">Cash</option>
+                        <option value="UPI">UPI</option>
+                    </select>
+
+                    <button onclick="submitFee()" style="margin-top:20px; width:100%; padding:15px; background:var(--saffron); border:none; color:white; font-weight:bold; cursor:pointer;">Confirm Payment</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- ⚙️ UPDATE THIS URL ⚙️ ---
+        const API_URL = "https://script.google.com/macros/s/AKfycbw7-9IYUAcTL5AxaIaTo3W5U7JB62J-GGKokzkVsaatV9AE9r-xv836ZW3-o9sgHuii-A/exec"; 
+
+        // LOGIN
+        const creds = { "admin1": "admin1@2026", "admin2": "admin2@2026", "admin3": "admin3@2026" };
+        function handleLogin() {
+            const u = document.getElementById('username').value.trim();
+            const p = document.getElementById('password').value.trim();
+            if(creds[u] === p) {
+                document.getElementById('login-screen').style.display = 'none';
+                document.getElementById('dashboard').style.display = 'flex';
+                fetchAllData();
+            } else { Swal.fire("Error", "Invalid Password", "error"); }
+        }
+
+        // SIDEBAR
+        function openSidebar() {
+            document.getElementById('sidebar').classList.add('active');
+            document.querySelector('.sidebar-overlay').style.display = 'block';
+        }
+        function closeSidebar() {
+            document.getElementById('sidebar').classList.remove('active');
+            document.querySelector('.sidebar-overlay').style.display = 'none';
+        }
+        function showSection(id) {
+            document.getElementById('home').style.display = 'none';
+            document.getElementById('fee').style.display = 'none';
+            document.getElementById(id).style.display = 'block';
+            closeSidebar();
+        }
+
+        // DATA HANDLING
+        let usersData = [];
+
+        async function fetchAllData() {
+            document.getElementById('loader').style.display = 'flex';
+            try {
+                const res = await fetch(API_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({ action: 'getParticipants' })
+                });
+                const json = await res.json();
+                
+                if(json.success) {
+                    usersData = json.data;
+                    renderTable(usersData);
+                } else {
+                    console.error("Backend Error:", json.message);
+                }
+            } catch(e) {
+                console.error("Fetch Error:", e);
+                // Swal.fire("Connection Error", "Check console", "error");
+            }
+            document.getElementById('loader').style.display = 'none';
+        }
+
+        function renderTable(data) {
+            const tbody = document.querySelector('#participants-table tbody');
+            tbody.innerHTML = '';
+            if(data.length === 0) { tbody.innerHTML = '<tr><td colspan="5">No Data Found</td></tr>'; return; }
+
+            data.forEach(u => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${u.RegID}</td>
+                        <td>${u.Name}</td>
+                        <td>${u.Category}</td>
+                        <td style="color:${u.Status==='Paid'?'green':'red'}">${u.Status}</td>
+                        <td><button class="btn-action btn-red" onclick="deleteUser('${u.RegID}')"><i class="fas fa-trash"></i></button></td>
+                    </tr>
+                `;
+            });
+        }
+
+        function searchTable() {
+            const term = document.getElementById('home-search').value.toLowerCase();
+            if(!term) { renderTable(usersData); return; }
+            const filtered = usersData.filter(u => 
+                (u.Name && u.Name.toLowerCase().includes(term)) || 
+                (u.RegID && String(u.RegID).includes(term))
+            );
+            renderTable(filtered);
+        }
+
+        // FEE LOGIC
+        function filterFeeSearch() {
+            const term = document.getElementById('fee-search').value.toLowerCase();
+            const div = document.getElementById('fee-results');
+            div.innerHTML = '';
+            if(term.length < 2) { div.style.display = 'none'; return; }
+            
+            const filtered = usersData.filter(u => u.Name.toLowerCase().includes(term));
+            div.style.display = 'block';
+            
+            filtered.forEach(u => {
+                const item = document.createElement('div');
+                item.style.padding = '10px';
+                item.style.borderBottom = '1px solid #eee';
+                item.style.cursor = 'pointer';
+                item.innerHTML = `<b>${u.Name}</b> (${u.RegID})`;
+                item.onclick = () => {
+                    document.getElementById('fee-results').style.display = 'none';
+                    document.getElementById('fee-form').style.display = 'block';
+                    document.getElementById('fee-user-name').innerText = u.Name;
+                    document.getElementById('fee-reg-id').value = u.RegID;
+                    document.getElementById('fee-category').value = u.Category || "Student";
+                    autoFill();
+                };
+                div.appendChild(item);
+            });
+        }
+
+        function autoFill() {
+            const cat = document.getElementById('fee-category').value;
+            const map = { "Faculty/Academicians": 1000, "Research Scholar": 700, "Student": 500 };
+            document.getElementById('fee-amount').value = map[cat] || 0;
+        }
+
+        async function submitFee() {
+            const payload = {
+                action: 'updateFee',
+                regId: document.getElementById('fee-reg-id').value,
+                category: document.getElementById('fee-category').value,
+                feeReq: document.getElementById('fee-amount').value,
+                feePaid: document.getElementById('fee-amount').value,
+                mode: document.getElementById('fee-mode').value
+            };
+            
+            document.getElementById('loader').style.display = 'flex';
+            await fetch(API_URL, { method:'POST', body:JSON.stringify(payload) });
+            await fetchAllData();
+            document.getElementById('loader').style.display = 'none';
+            document.getElementById('fee-form').style.display = 'none';
+            Swal.fire("Success", "Fee Updated", "success");
+        }
+
+        async function deleteUser(id) {
+            if(!confirm("Delete user?")) return;
+            document.getElementById('loader').style.display = 'flex';
+            await fetch(API_URL, { method:'POST', body:JSON.stringify({action:'deleteParticipant', regId:id}) });
+            await fetchAllData();
+            document.getElementById('loader').style.display = 'none';
+        }
+    </script>
+</body>
+  </html>
