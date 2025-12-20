@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Portal - Fee Collection</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <style>
+        :root {
+            --navy: #000080;
+            --saffron: #FF9933;
+            --white: #ffffff;
+            --light-gray: #f4f4f4;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', sans-serif; }
+        
+        body { background: var(--light-gray); height: 100vh; overflow: hidden; }
+
+        /* --- LOGIN SECTION --- */
+        #login-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(135deg, var(--navy), #000);
+            display: flex; justify-content: center; align-items: center; z-index: 9999;
+        }
+        .login-box {
+            background: white; padding: 40px; border-radius: 10px; width: 350px; text-align: center;
+            border-top: 5px solid var(--saffron); box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        .login-box input {
+            width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 5px;
+        }
+        .login-box button {
+            width: 100%; padding: 12px; background: var(--navy); color: white; border: none;
+            border-radius: 5px; font-weight: bold; cursor: pointer; transition: 0.3s;
+        }
+        .login-box button:hover { background: var(--saffron); }
+
+        /* --- DASHBOARD LAYOUT --- */
+        #dashboard { display: none; height: 100%; display: flex; } /* Hidden by default */
+        
+        /* Sidebar */
+        .sidebar {
+            width: 250px; background: var(--navy); color: white; height: 100%;
+            display: flex; flex-direction: column; padding: 20px; transition: 0.3s;
+        }
+        .sidebar h2 { margin-bottom: 30px; font-size: 1.2rem; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 10px; }
+        .menu-item {
+            padding: 15px; cursor: pointer; border-radius: 5px; margin-bottom: 5px; display: flex; align-items: center; gap: 10px;
+        }
+        .menu-item:hover, .menu-item.active { background: rgba(255,255,255,0.1); border-left: 4px solid var(--saffron); }
+        .logout-btn { margin-top: auto; background: #c0392b; text-align: center; }
+
+        /* Main Content */
+        .main-content { flex: 1; padding: 30px; overflow-y: auto; position: relative; }
+        .section { display: none; animation: fadeIn 0.5s; }
+        .section.active { display: block; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* --- TABLES & FORMS --- */
+        h1 { color: var(--navy); margin-bottom: 20px; }
+        
+        .search-bar { width: 100%; padding: 15px; border: 2px solid var(--navy); border-radius: 8px; margin-bottom: 20px; font-size: 1rem; }
+
+        table { width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        th, td { padding: 15px; text-align: left; border-bottom: 1px solid #eee; }
+        th { background: var(--navy); color: white; }
+        tr:hover { background: #f9f9f9; }
+        
+        .btn-action { padding: 5px 10px; border-radius: 4px; border: none; cursor: pointer; font-size: 0.8rem; color: white; margin-right: 5px; }
+        .btn-edit { background: var(--saffron); }
+        .btn-delete { background: #c0392b; }
+
+        /* Fee Form */
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: 600; color: #555; }
+        .form-group select, .form-group input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; }
+        .submit-btn { background: var(--green); color: white; padding: 12px 25px; border: none; border-radius: 5px; cursor: pointer; font-size: 1rem; font-weight: bold; }
+        
+        .loading-overlay {
+            position: absolute; top:0; left:0; width:100%; height:100%; background:rgba(255,255,255,0.8);
+            display:none; justify-content:center; align-items:center; z-index: 50;
+        }
+        .spinner { border: 4px solid #f3f3f3; border-top: 4px solid var(--navy); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* Mobile Burger */
+        .burger { display: none; font-size: 1.5rem; margin-bottom: 10px; cursor: pointer; color: var(--navy); }
+        @media(max-width: 768px) {
+            .sidebar { position: fixed; left: -250px; z-index: 1000; }
+            .sidebar.show { left: 0; }
+            .burger { display: block; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="login-screen">
+        <div class="login-box">
+            <h2 style="color:var(--navy); margin-bottom:10px;">Admin Portal</h2>
+            <p style="color:#666; margin-bottom:20px;">On-the-Spot Fee Collection</p>
+            <input type="text" id="username" placeholder="Username">
+            <input type="password" id="password" placeholder="Password">
+            <button onclick="handleLogin()">Login Securely</button>
+        </div>
+    </div>
+
+    <div id="dashboard" style="display:none;"> <div class="sidebar" id="sidebar">
+            <h2>Viksit Bharat Admin</h2>
+            <div class="menu-item active" onclick="showSection('home')"><i class="fas fa-home"></i> Participants</div>
+            <div class="menu-item" onclick="showSection('fee')"><i class="fas fa-rupee-sign"></i> Fee Collect</div>
+            <div class="menu-item" onclick="showSection('announce')"><i class="fas fa-bullhorn"></i> Announcements</div>
+            <div class="menu-item logout-btn" onclick="location.reload()"><i class="fas fa-sign-out-alt"></i> Logout</div>
+        </div>
+
+        <div class="main-content">
+            <div class="burger" onclick="document.getElementById('sidebar').classList.toggle('show')">
+                <i class="fas fa-bars"></i>
+            </div>
+
+            <div class="loading-overlay" id="loader"><div class="spinner"></div></div>
+
+            <div id="home" class="section active">
+                <h1><i class="fas fa-users"></i> All Participants</h1>
+                <button onclick="fetchAllData()" style="margin-bottom:10px; padding:5px 10px; cursor:pointer;">Refresh Data</button>
+                <div style="overflow-x:auto;">
+                    <table id="participants-table">
+                        <thead>
+                            <tr>
+                                <th>Reg ID</th><th>Name</th><th>Category</th><th>Status</th><th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="fee" class="section">
+                <h1><i class="fas fa-cash-register"></i> Fee Collection</h1>
+                <input type="text" id="search-input" class="search-bar" placeholder="Search by Name or Reg ID..." onkeyup="filterSearch()">
+                
+                <div id="search-results" style="margin-bottom:20px; max-height:200px; overflow-y:auto; border:1px solid #eee; display:none;">
+                    </div>
+
+                <div id="fee-form" style="background:white; padding:20px; border-radius:10px; display:none; border-left:5px solid var(--saffron);">
+                    <h3 id="selected-user-name" style="margin-bottom:15px; color:var(--navy);"></h3>
+                    <input type="hidden" id="selected-reg-id">
+                    
+                    <div class="form-group">
+                        <label>Category</label>
+                        <select id="fee-category" onchange="updateAmount()">
+                            <option value="">Select Category</option>
+                            <option value="Faculty/Academicians">Faculty/Academicians</option>
+                            <option value="Research Scholar">Research Scholar</option>
+                            <option value="Student">Student</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Amount Required (₹)</label>
+                        <input type="number" id="fee-amount-req" readonly style="background:#eee;">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Amount Paid (₹)</label>
+                        <input type="number" id="fee-amount-paid">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Payment Mode</label>
+                        <select id="fee-mode">
+                            <option value="Cash">Cash</option>
+                            <option value="UPI">UPI/QR Code</option>
+                            <option value="Card">Debit/Credit Card</option>
+                        </select>
+                    </div>
+
+                    <button class="submit-btn" onclick="submitFee()">Confirm & Send Receipt</button>
+                </div>
+            </div>
+
+            <div id="announce" class="section">
+                <h1><i class="fas fa-broadcast-tower"></i> Post Announcement</h1>
+                <div style="background:white; padding:20px; border-radius:10px;">
+                    <textarea id="announce-msg" rows="5" style="width:100%; padding:10px; border:1px solid #ccc; border-radius:5px;" placeholder="Write announcement..."></textarea>
+                    <br><br>
+                    <button class="submit-btn" style="background:var(--navy);" onclick="postAnnouncement()">Upload</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // --- CONFIGURATION ---
+        // PASTE YOUR GOOGLE APPS SCRIPT WEB APP URL BELOW:
+        const API_URL = "https://script.google.com/a/~/macros/s/AKfycbwdM5hJglyxsT9jA6p0IOy96FHm0o3_bEDRl55qRZD3tYuTo5yemTBd2CKsDZDoUlVE/exec"; 
+
+        // --- 1. LOGIN SYSTEM ---
+        const users = {
+            "admin1": "admin1@2026",
+            "admin2": "admin2@2026",
+            "admin3": "admin3@2026"
+        };
+
+        function handleLogin() {
+            const u = document.getElementById('username').value;
+            const p = document.getElementById('password').value;
+
+            if (users[u] && users[u] === p) {
+                document.getElementById('login-screen').style.display = 'none';
+                document.getElementById('dashboard').style.display = 'flex';
+                fetchAllData(); // Load data on login
+                Swal.fire({ icon: 'success', title: 'Welcome Admin', timer: 1500, showConfirmButton: false });
+            } else {
+                Swal.fire({ icon: 'error', title: 'Access Denied', text: 'Invalid Credentials' });
+            }
+        }
+
+        // --- 2. NAVIGATION ---
+        function showSection(id) {
+            document.querySelectorAll('.section').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.menu-item').forEach(el => el.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            // Highlight menu logic skipped for brevity
+        }
+
+        // --- 3. DATA HANDLING ---
+        let allParticipants = [];
+
+        async function fetchAllData() {
+            document.getElementById('loader').style.display = 'flex';
+            try {
+                // We use POST with no-cors usually, but to get data back we rely on the specific GAS structure
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({ action: 'getParticipants' })
+                });
+                const json = await response.json();
+                if(json.success) {
+                    allParticipants = json.data;
+                    renderTable(allParticipants);
+                }
+            } catch (e) {
+                console.error(e);
+                // Fallback for demo if fetch fails (cors) or empty
+                // allParticipants = [{RegID:"101", Name:"Demo User", Category:"Student", Status:"Pending"}]; 
+                // renderTable(allParticipants);
+            }
+            document.getElementById('loader').style.display = 'none';
+        }
+
+        function renderTable(data) {
+            const tbody = document.querySelector('#participants-table tbody');
+            tbody.innerHTML = '';
+            data.forEach(user => {
+                const tr = `<tr>
+                    <td>${user.RegID || ''}</td>
+                    <td>${user.Name || ''}</td>
+                    <td>${user.Category || '-'}</td>
+                    <td style="color:${user.Status === 'Paid' ? 'green' : 'red'}; font-weight:bold;">${user.Status || 'Pending'}</td>
+                    <td>
+                        <button class="btn-action btn-delete" onclick="deleteUser('${user.RegID}')"><i class="fas fa-trash"></i></button>
+                    </td>
+                </tr>`;
+                tbody.innerHTML += tr;
+            });
+        }
+
+        // --- 4. FEE COLLECTION LOGIC ---
+        function filterSearch() {
+            const query = document.getElementById('search-input').value.toLowerCase();
+            const resultsDiv = document.getElementById('search-results');
+            
+            if(query.length < 2) { resultsDiv.style.display = 'none'; return; }
+
+            const filtered = allParticipants.filter(p => 
+                (p.Name && p.Name.toLowerCase().includes(query)) || 
+                (p.RegID && String(p.RegID).includes(query))
+            );
+
+            resultsDiv.innerHTML = '';
+            resultsDiv.style.display = 'block';
+            
+            filtered.forEach(p => {
+                const div = document.createElement('div');
+                div.style.padding = '10px';
+                div.style.borderBottom = '1px solid #eee';
+                div.style.cursor = 'pointer';
+                div.style.background = 'white';
+                div.innerHTML = `<strong>${p.Name}</strong> (ID: ${p.RegID})`;
+                div.onclick = () => selectUserForFee(p);
+                resultsDiv.appendChild(div);
+            });
+        }
+
+        function selectUserForFee(user) {
+            document.getElementById('search-results').style.display = 'none';
+            document.getElementById('fee-form').style.display = 'block';
+            document.getElementById('selected-user-name').innerText = `Collecting Fee for: ${user.Name}`;
+            document.getElementById('selected-reg-id').value = user.RegID;
+            
+            // Pre-fill if existing
+            if(user.Category) document.getElementById('fee-category').value = user.Category;
+            updateAmount();
+        }
+
+        function updateAmount() {
+            const cat = document.getElementById('fee-category').value;
+            const amountBox = document.getElementById('fee-amount-req');
+            if(cat === "Faculty/Academicians") amountBox.value = 1000;
+            else if(cat === "Research Scholar") amountBox.value = 700;
+            else if(cat === "Student") amountBox.value = 500;
+            else amountBox.value = 0;
+        }
+
+        async function submitFee() {
+            const regId = document.getElementById('selected-reg-id').value;
+            const category = document.getElementById('fee-category').value;
+            const feeReq = document.getElementById('fee-amount-req').value;
+            const feePaid = document.getElementById('fee-amount-paid').value;
+            const mode = document.getElementById('fee-mode').value;
+
+            if(!feePaid) { Swal.fire('Error', 'Please enter amount paid', 'warning'); return; }
+
+            document.getElementById('loader').style.display = 'flex';
+
+            const payload = {
+                action: 'updateFee',
+                regId: regId,
+                category: category,
+                feeReq: feeReq,
+                feePaid: feePaid,
+                mode: mode
+            };
+
+            try {
+                const res = await fetch(API_URL, {
+                    method: 'POST',
+                    body: JSON.stringify(payload)
+                });
+                const json = await res.json();
+                
+                if(json.success) {
+                    Swal.fire('Success', 'Fee Updated & Email Sent!', 'success');
+                    document.getElementById('fee-form').style.display = 'none';
+                    document.getElementById('search-input').value = '';
+                    fetchAllData(); // Refresh list
+                } else {
+                    Swal.fire('Error', json.message || 'Failed', 'error');
+                }
+            } catch(e) {
+                Swal.fire('Error', 'Network Error', 'error');
+            }
+            document.getElementById('loader').style.display = 'none';
+        }
+
+        // --- 5. DELETE USER ---
+        async function deleteUser(id) {
+            const result = await Swal.fire({
+                title: 'Are you sure?', text: "You won't be able to revert this!",
+                icon: 'warning', showCancelButton: true, confirmButtonText: 'Yes, delete it!'
+            });
+
+            if (result.isConfirmed) {
+                document.getElementById('loader').style.display = 'flex';
+                await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'deleteParticipant', regId: id }) });
+                fetchAllData();
+                Swal.fire('Deleted!', 'User has been removed.', 'success');
+            }
+        }
+
+        // --- 6. ANNOUNCEMENT ---
+        async function postAnnouncement() {
+            const msg = document.getElementById('announce-msg').value;
+            if(!msg) return;
+            document.getElementById('loader').style.display = 'flex';
+            await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'postAnnouncement', message: msg }) });
+            document.getElementById('loader').style.display = 'none';
+            document.getElementById('announce-msg').value = '';
+            Swal.fire('Posted', 'Announcement uploaded successfully', 'success');
+        }
+
+    </script>
+</body>
+</html>
