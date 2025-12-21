@@ -116,9 +116,31 @@
             <div class="loader" id="loader"><div class="spinner"></div></div>
 
             <div id="home" class="section">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px;">
+    <div style="background:white; padding:20px; border-radius:10px; border-left:5px solid var(--navy); box-shadow:0 2px 5px rgba(0,0,0,0.1);">
+        <h3 style="font-size:0.9rem; color:#777;">Total Participants</h3>
+        <div id="stat-total" style="font-size:1.8rem; font-weight:bold; color:var(--navy);">0</div>
+    </div>
+    <div style="background:white; padding:20px; border-radius:10px; border-left:5px solid var(--green); box-shadow:0 2px 5px rgba(0,0,0,0.1);">
+        <h3 style="font-size:0.9rem; color:#777;">Fees Collected</h3>
+        <div id="stat-money" style="font-size:1.8rem; font-weight:bold; color:var(--green);">₹0</div>
+    </div>
+    <div style="background:white; padding:20px; border-radius:10px; border-left:5px solid #c0392b; box-shadow:0 2px 5px rgba(0,0,0,0.1);">
+        <h3 style="font-size:0.9rem; color:#777;">Pending Users</h3>
+        <div id="stat-pending" style="font-size:1.8rem; font-weight:bold; color:#c0392b;">0</div>
+    </div>
+</div>
                 <div style="display:flex; gap:10px;">
+                    <label style="margin-right: 15px; cursor: pointer;">
+    <input type="checkbox" id="pendingFilter" onchange="togglePendingFilter()"> 
+    <span style="font-weight:bold; color:var(--red);">Show Pending Only</span>
+</label>
                     <input type="text" id="home-search" class="search-bar" placeholder="Search by Name or ID..." onkeyup="searchTable()">
                     <button onclick="fetchAllData()" style="height:45px; padding:0 20px; background:var(--navy); color:white; border:none; border-radius:6px; cursor:pointer;">Refresh</button>
+                <label style="display:flex; align-items:center; gap:5px; cursor:pointer; background:white; padding:0 10px; border-radius:5px; border:1px solid #ddd;">
+    <input type="checkbox" id="filter-pending" onchange="applyFilters()">
+    <span style="font-size:0.9rem; color:#c0392b; font-weight:bold;">Pending Only</span>
+</label>
                 </div>
                 
                 <div class="table-wrapper">
@@ -169,6 +191,15 @@
     </div>
 
     <script>
+        function togglePendingFilter() {
+    const isChecked = document.getElementById('pendingFilter').checked;
+    if (isChecked) {
+        const pending = usersData.filter(u => u.Status !== 'Paid');
+        renderTable(pending);
+    } else {
+        renderTable(usersData); // Show all
+    }
+}
         // --- ⚙️ UPDATE THIS URL ⚙️ ---
         const API_URL = "https://script.google.com/macros/s/AKfycbw7-9IYUAcTL5AxaIaTo3W5U7JB62J-GGKokzkVsaatV9AE9r-xv836ZW3-o9sgHuii-A/exec"; 
 
@@ -215,6 +246,8 @@
                 if(json.success) {
                     usersData = json.data;
                     renderTable(usersData);
+                    // Inside fetchAllData(), right after renderTable(usersData);
+updateStats(usersData);
                 } else {
                     console.error("Backend Error:", json.message);
                 }
@@ -241,6 +274,11 @@
                     </tr>
                 `;
             });
+            // Add the button next to the delete button in the HTML string:
+<td>
+    <button class="btn-action" style="background:#000080;" onclick="printID('${user.RegID}')" title="Print ID"><i class="fas fa-id-badge"></i></button>
+    <button class="btn-action btn-red" ... (existing delete button)
+</td>
         }
 
         function searchTable() {
@@ -287,23 +325,43 @@
             document.getElementById('fee-amount').value = map[cat] || 0;
         }
 
-        async function submitFee() {
-            const payload = {
-                action: 'updateFee',
-                regId: document.getElementById('fee-reg-id').value,
-                category: document.getElementById('fee-category').value,
-                feeReq: document.getElementById('fee-amount').value,
-                feePaid: document.getElementById('fee-amount').value,
-                mode: document.getElementById('fee-mode').value
-            };
-            
-            document.getElementById('loader').style.display = 'flex';
-            await fetch(API_URL, { method:'POST', body:JSON.stringify(payload) });
-            await fetchAllData();
-            document.getElementById('loader').style.display = 'none';
-            document.getElementById('fee-form').style.display = 'none';
-            Swal.fire("Success", "Fee Updated", "success");
-        }
+       function renderTable(data) {
+    const tbody = document.querySelector('#participants-table tbody');
+    tbody.innerHTML = '';
+    
+    if (data.length === 0) { 
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:20px;">No Data Found</td></tr>'; 
+        return; 
+    }
+
+    data.forEach(u => {
+        // Status Badge Logic
+        const statusColor = u.Status === 'Paid' ? 'green' : 'red';
+        const statusIcon = u.Status === 'Paid' ? '<i class="fas fa-check-circle"></i>' : '<i class="fas fa-clock"></i>';
+
+        tbody.innerHTML += `
+            <tr style="border-left: 4px solid ${u.Status === 'Paid' ? 'var(--green)' : 'var(--saffron)'}">
+                <td><strong>${u.RegID}</strong></td>
+                <td>${u.Name}</td>
+                <td>${u.Category}</td>
+                <td style="color:${statusColor}; font-weight:bold;">${statusIcon} ${u.Status}</td>
+                <td style="display:flex; gap:5px;">
+                    <button class="btn-action" style="background:var(--navy);" onclick="printID('${u.RegID}')" title="Print ID Card">
+                        <i class="fas fa-id-badge"></i>
+                    </button>
+                    
+                    <button class="btn-action" style="background:#25D366;" onclick="openWhatsApp('${u.RegID}', '${u.Name}')" title="Send WhatsApp">
+                        <i class="fab fa-whatsapp"></i>
+                    </button>
+
+                    <button class="btn-action btn-red" onclick="deleteUser('${u.RegID}')" title="Delete User">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </td>
+            </tr>
+        `;
+    });
+}
 
         async function deleteUser(id) {
             if(!confirm("Delete user?")) return;
@@ -312,6 +370,60 @@
             await fetchAllData();
             document.getElementById('loader').style.display = 'none';
         }
+        function updateStats(data) {
+    const total = data.length;
+    // Sum up FeePaid column (ensure it's a number)
+    const money = data.reduce((sum, user) => sum + (Number(user.FeePaid) || 0), 0);
+    const pending = data.filter(u => u.Status !== 'Paid').length;
+
+    document.getElementById('stat-total').innerText = total;
+    document.getElementById('stat-money').innerText = "₹" + money.toLocaleString('en-IN');
+    document.getElementById('stat-pending').innerText = pending;
+}
+        function printID(regId) {
+    const user = usersData.find(u => String(u.RegID) === String(regId));
+    if(!user) return;
+
+    const w = window.open('', '', 'height=500,width=350');
+    w.document.write(`
+        <html><head><title>ID Card</title>
+        <style>
+            body { font-family: sans-serif; padding: 20px; display:flex; justify-content:center; }
+            .card { width: 300px; border: 2px solid #000080; border-radius: 10px; text-align: center; overflow: hidden; }
+            .top { background: #000080; color: white; padding: 15px; }
+            .name { font-size: 20px; font-weight: bold; margin: 15px 0 5px; }
+            .meta { color: #555; font-size: 14px; margin-bottom: 5px; }
+            .cat { background: #FF9933; color: white; display: inline-block; padding: 5px 15px; border-radius: 20px; font-weight: bold; margin: 10px 0; }
+            .qr { width: 100px; height: 100px; background: #eee; margin: 10px auto; line-height: 100px; color: #aaa; border: 1px dashed #999; }
+        </style>
+        </head><body onload="window.print()">
+            <div class="card">
+                <div class="top">
+                    <h3>National Seminar 2026</h3>
+                    <small>Viksit Bharat @2047</small>
+                </div>
+                <div class="qr">PHOTO</div>
+                <div class="name">${user.Name}</div>
+                <div class="meta">ID: ${user.RegID}</div>
+                <div class="cat">${user.Category}</div>
+                <p style="font-size:12px; margin-top:20px;">Shri Baldeo P.G. College</p>
+            </div>
+        </body></html>
+    `);
+    w.document.close();
+}
+        function applyFilters() {
+    const term = document.getElementById('home-search').value.toLowerCase();
+    const showPendingOnly = document.getElementById('filter-pending').checked;
+
+    const filtered = usersData.filter(u => {
+        const matchesSearch = (u.Name && u.Name.toLowerCase().includes(term)) || (u.RegID && String(u.RegID).includes(term));
+        const matchesStatus = showPendingOnly ? (u.Status !== 'Paid') : true;
+        return matchesSearch && matchesStatus;
+    });
+    
+    renderTable(filtered);
+}
     </script>
 </body>
   </html>
