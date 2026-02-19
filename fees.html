@@ -14,39 +14,8 @@
             --saffron: #FF9933;
             --white: #ffffff;
             --light-gray: #f4f4f4;
-            --green: #27ae60; /* Added this missing variable */
+            --green: #27ae60;
             --red: #c0392b;
-        }
-
-        /* ... existing styles ... */
-
-        .button-group {
-            display: flex;
-            gap: 10px;
-            margin-top: 20px;
-        }
-
-        .submit-btn { 
-            background: var(--green); 
-            color: white; 
-            padding: 12px 25px; 
-            border: none; 
-            border-radius: 5px; 
-            cursor: pointer; 
-            font-size: 1rem; 
-            font-weight: bold; 
-            transition: 0.3s;
-        }
-        
-        .submit-btn:hover { opacity: 0.9; }
-
-        .cancel-btn {
-            background: #95a5a6;
-            color: white;
-            padding: 12px 25px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', sans-serif; }
         
@@ -72,7 +41,7 @@
         .login-box button:hover { background: var(--saffron); }
 
         /* --- DASHBOARD LAYOUT --- */
-        #dashboard { display: none; height: 100%; display: flex; } /* Hidden by default */
+        #dashboard { display: none; height: 100%; display: flex; } 
         
         /* Sidebar */
         .sidebar {
@@ -104,15 +73,19 @@
         tr:hover { background: #f9f9f9; }
         
         .btn-action { padding: 5px 10px; border-radius: 4px; border: none; cursor: pointer; font-size: 0.8rem; color: white; margin-right: 5px; }
-        .btn-edit { background: var(--saffron); }
         .btn-delete { background: #c0392b; }
 
-        /* Fee Form */
+        /* Forms */
+        .form-container { background: white; padding: 20px; border-radius: 10px; border-left: 5px solid var(--saffron); box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
         .form-group { margin-bottom: 15px; }
         .form-group label { display: block; margin-bottom: 5px; font-weight: 600; color: #555; }
         .form-group select, .form-group input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; }
         
-        
+        .button-group { display: flex; gap: 10px; margin-top: 20px; }
+        .submit-btn { background: var(--green); color: white; padding: 12px 25px; border: none; border-radius: 5px; cursor: pointer; font-size: 1rem; font-weight: bold; transition: 0.3s; }
+        .submit-btn:hover { opacity: 0.9; }
+        .cancel-btn { background: #95a5a6; color: white; padding: 12px 25px; border: none; border-radius: 5px; cursor: pointer; }
+
         .loading-overlay {
             position: absolute; top:0; left:0; width:100%; height:100%; background:rgba(255,255,255,0.8);
             display:none; justify-content:center; align-items:center; z-index: 50;
@@ -120,7 +93,6 @@
         .spinner { border: 4px solid #f3f3f3; border-top: 4px solid var(--navy); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        /* Mobile Burger */
         .burger { display: none; font-size: 1.5rem; margin-bottom: 10px; cursor: pointer; color: var(--navy); }
         @media(max-width: 768px) {
             .sidebar { position: fixed; left: -250px; z-index: 1000; }
@@ -141,10 +113,12 @@
         </div>
     </div>
 
-    <div id="dashboard" style="display:none;"> <div class="sidebar" id="sidebar">
+    <div id="dashboard" style="display:none;"> 
+        <div class="sidebar" id="sidebar">
             <h2>Viksit Bharat Admin</h2>
             <div class="menu-item active" onclick="showSection('home')"><i class="fas fa-home"></i> Participants</div>
             <div class="menu-item" onclick="showSection('fee')"><i class="fas fa-rupee-sign"></i> Fee Collect</div>
+            <div class="menu-item" onclick="showSection('instant')"><i class="fas fa-user-plus"></i> Quick Register</div>
             <div class="menu-item" onclick="showSection('announce')"><i class="fas fa-bullhorn"></i> Announcements</div>
             <div class="menu-item logout-btn" onclick="location.reload()"><i class="fas fa-sign-out-alt"></i> Logout</div>
         </div>
@@ -175,33 +149,29 @@
                 <h1><i class="fas fa-cash-register"></i> Fee Collection</h1>
                 <input type="text" id="search-input" class="search-bar" placeholder="Search by Name or Reg ID..." onkeyup="filterSearch()">
                 
-                <div id="search-results" style="margin-bottom:20px; max-height:200px; overflow-y:auto; border:1px solid #eee; display:none;">
-                    </div>
+                <div id="search-results" style="margin-bottom:20px; max-height:200px; overflow-y:auto; border:1px solid #eee; display:none;"></div>
 
-                <div id="fee-form" style="background:white; padding:20px; border-radius:10px; display:none; border-left:5px solid var(--saffron);">
+                <div id="fee-form" class="form-container" style="display:none;">
                     <h3 id="selected-user-name" style="margin-bottom:15px; color:var(--navy);"></h3>
                     <input type="hidden" id="selected-reg-id">
                     
                     <div class="form-group">
                         <label>Category</label>
-                        <select id="fee-category" onchange="updateAmount()">
+                        <select id="fee-category" onchange="updateAmount('fee')">
                             <option value="">Select Category</option>
                             <option value="Faculty/Academicians">Faculty/Academicians</option>
                             <option value="Research Scholar">Research Scholar</option>
                             <option value="Student">Student</option>
                         </select>
                     </div>
-
                     <div class="form-group">
                         <label>Amount Required (₹)</label>
                         <input type="number" id="fee-amount-req" readonly style="background:#eee;">
                     </div>
-
                     <div class="form-group">
                         <label>Amount Paid (₹)</label>
                         <input type="number" id="fee-amount-paid">
                     </div>
-
                     <div class="form-group">
                         <label>Payment Mode</label>
                         <select id="fee-mode">
@@ -211,8 +181,59 @@
                             <option value="AlreadyPaid">Advance Paid</option>
                         </select>
                     </div>
+                    <div class="button-group">
+                        <button class="submit-btn" onclick="submitFee()"><i class="fas fa-check-circle"></i> Confirm & Send Receipt</button>
+                        <button class="cancel-btn" onclick="document.getElementById('fee-form').style.display='none'">Cancel</button>
+                    </div>
+                </div>
+            </div>
 
-                    <button class="submit-btn" onclick="submitFee()">Confirm & Send Receipt</button>
+            <div id="instant" class="section">
+                <h1><i class="fas fa-user-plus"></i> Instant Registration</h1>
+                <div class="form-container">
+                    <p style="margin-bottom:15px; color:#666;">On-the-spot registration. ID will be auto-generated.</p>
+                    
+                    <div class="form-group">
+                        <label>Full Name</label>
+                        <input type="text" id="inst-name" placeholder="Enter Full Name">
+                    </div>
+                    <div class="form-group">
+                        <label>Designation</label>
+                        <input type="text" id="inst-designation" placeholder="e.g. Asst Professor, Student">
+                    </div>
+                    <div class="form-group">
+                        <label>Email Address</label>
+                        <input type="email" id="inst-email" placeholder="Enter Email for Receipt">
+                    </div>
+
+                    <div style="border-top:1px solid #eee; margin: 15px 0;"></div>
+
+                    <div class="form-group">
+                        <label>Category</label>
+                        <select id="inst-category" onchange="updateAmount('inst')">
+                            <option value="">Select Category</option>
+                            <option value="Faculty/Academicians">Faculty/Academicians</option>
+                            <option value="Research Scholar">Research Scholar</option>
+                            <option value="Student">Student</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Amount Required (₹)</label>
+                        <input type="number" id="inst-amount-req" readonly style="background:#eee;">
+                    </div>
+                    <div class="form-group">
+                        <label>Amount Collected (₹)</label>
+                        <input type="number" id="inst-amount-paid">
+                    </div>
+                    <div class="form-group">
+                        <label>Payment Mode</label>
+                        <select id="inst-mode">
+                            <option value="Cash">Cash</option>
+                            <option value="UPI">UPI/QR Code</option>
+                            <option value="Card">Debit/Credit Card</option>
+                        </select>
+                    </div>
+                    <button class="submit-btn" onclick="submitInstant()"><i class="fas fa-paper-plane"></i> Register & Send Receipt</button>
                 </div>
             </div>
 
@@ -247,7 +268,7 @@
             if (users[u] && users[u] === p) {
                 document.getElementById('login-screen').style.display = 'none';
                 document.getElementById('dashboard').style.display = 'flex';
-                fetchAllData(); // Load data on login
+                fetchAllData(); 
                 Swal.fire({ icon: 'success', title: 'Welcome Admin', timer: 1500, showConfirmButton: false });
             } else {
                 Swal.fire({ icon: 'error', title: 'Access Denied', text: 'Invalid Credentials' });
@@ -259,7 +280,10 @@
             document.querySelectorAll('.section').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.menu-item').forEach(el => el.classList.remove('active'));
             document.getElementById(id).classList.add('active');
-            // Highlight menu logic skipped for brevity
+            
+            // Highlight active menu item
+            const menuMap = {'home':0, 'fee':1, 'instant':2, 'announce':3};
+            document.querySelectorAll('.menu-item')[menuMap[id]].classList.add('active');
         }
 
         // --- 3. DATA HANDLING ---
@@ -268,7 +292,6 @@
         async function fetchAllData() {
             document.getElementById('loader').style.display = 'flex';
             try {
-                // We use POST with no-cors usually, but to get data back we rely on the specific GAS structure
                 const response = await fetch(API_URL, {
                     method: 'POST',
                     body: JSON.stringify({ action: 'getParticipants' })
@@ -278,12 +301,7 @@
                     allParticipants = json.data;
                     renderTable(allParticipants);
                 }
-            } catch (e) {
-                console.error(e);
-                // Fallback for demo if fetch fails (cors) or empty
-                // allParticipants = [{RegID:"101", Name:"Demo User", Category:"Student", Status:"Pending"}]; 
-                // renderTable(allParticipants);
-            }
+            } catch (e) { console.error(e); }
             document.getElementById('loader').style.display = 'none';
         }
 
@@ -296,9 +314,7 @@
                     <td>${user.Name || ''}</td>
                     <td>${user.Category || '-'}</td>
                     <td style="color:${user.Status === 'Paid' ? 'green' : 'red'}; font-weight:bold;">${user.Status || 'Pending'}</td>
-                    <td>
-                        <button class="btn-action btn-delete" onclick="deleteUser('${user.RegID}')"><i class="fas fa-trash"></i></button>
-                    </td>
+                    <td><button class="btn-action btn-delete" onclick="deleteUser('${user.RegID}')"><i class="fas fa-trash"></i></button></td>
                 </tr>`;
                 tbody.innerHTML += tr;
             });
@@ -308,7 +324,6 @@
         function filterSearch() {
             const query = document.getElementById('search-input').value.toLowerCase();
             const resultsDiv = document.getElementById('search-results');
-            
             if(query.length < 2) { resultsDiv.style.display = 'none'; return; }
 
             const filtered = allParticipants.filter(p => 
@@ -318,7 +333,6 @@
 
             resultsDiv.innerHTML = '';
             resultsDiv.style.display = 'block';
-            
             filtered.forEach(p => {
                 const div = document.createElement('div');
                 div.style.padding = '10px';
@@ -337,14 +351,13 @@
             document.getElementById('selected-user-name').innerText = `Collecting Fee for: ${user.Name}`;
             document.getElementById('selected-reg-id').value = user.RegID;
             
-            // Pre-fill if existing
             if(user.Category) document.getElementById('fee-category').value = user.Category;
-            updateAmount();
+            updateAmount('fee');
         }
 
-        function updateAmount() {
-            const cat = document.getElementById('fee-category').value;
-            const amountBox = document.getElementById('fee-amount-req');
+        function updateAmount(prefix) {
+            const cat = document.getElementById(`${prefix}-category`).value;
+            const amountBox = document.getElementById(`${prefix}-amount-req`);
             if(cat === "Faculty/Academicians") amountBox.value = 1000;
             else if(cat === "Research Scholar") amountBox.value = 700;
             else if(cat === "Student") amountBox.value = 500;
@@ -361,53 +374,68 @@
             if(!feePaid) { Swal.fire('Error', 'Please enter amount paid', 'warning'); return; }
 
             document.getElementById('loader').style.display = 'flex';
-
-            const payload = {
-                action: 'updateFee',
-                regId: regId,
-                category: category,
-                feeReq: feeReq,
-                feePaid: feePaid,
-                mode: mode
-            };
+            const payload = { action: 'updateFee', regId, category, feeReq, feePaid, mode };
 
             try {
-                const res = await fetch(API_URL, {
-                    method: 'POST',
-                    body: JSON.stringify(payload)
-                });
+                const res = await fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) });
                 const json = await res.json();
                 
                 if(json.success) {
                     Swal.fire('Success', 'Fee Updated & Email Sent!', 'success');
                     document.getElementById('fee-form').style.display = 'none';
                     document.getElementById('search-input').value = '';
-                    fetchAllData(); // Refresh list
-                } else {
-                    Swal.fire('Error', json.message || 'Failed', 'error');
-                }
-            } catch(e) {
-                Swal.fire('Error', 'Network Error', 'error');
-            }
+                    fetchAllData();
+                } else { Swal.fire('Error', json.message || 'Failed', 'error'); }
+            } catch(e) { Swal.fire('Error', 'Network Error', 'error'); }
             document.getElementById('loader').style.display = 'none';
         }
 
-        // --- 5. DELETE USER ---
-        async function deleteUser(id) {
-            const result = await Swal.fire({
-                title: 'Are you sure?', text: "You won't be able to revert this!",
-                icon: 'warning', showCancelButton: true, confirmButtonText: 'Yes, delete it!'
-            });
+        // --- 5. INSTANT REGISTRATION LOGIC (NEW) ---
+        async function submitInstant() {
+            const name = document.getElementById('inst-name').value;
+            const desig = document.getElementById('inst-designation').value;
+            const email = document.getElementById('inst-email').value;
+            const category = document.getElementById('inst-category').value;
+            const feeReq = document.getElementById('inst-amount-req').value;
+            const feePaid = document.getElementById('inst-amount-paid').value;
+            const mode = document.getElementById('inst-mode').value;
 
+            if(!name || !email || !feePaid) { Swal.fire('Missing Info', 'Please fill all fields', 'warning'); return; }
+
+            document.getElementById('loader').style.display = 'flex';
+            const payload = { 
+                action: 'instantRegistration', 
+                name, designation: desig, email, category, feeReq, feePaid, mode 
+            };
+
+            try {
+                const res = await fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) });
+                const json = await res.json();
+                
+                if(json.success) {
+                    Swal.fire('Success', `Registered! New ID: ${json.newId}`, 'success');
+                    // Reset Form
+                    document.getElementById('inst-name').value = '';
+                    document.getElementById('inst-designation').value = '';
+                    document.getElementById('inst-email').value = '';
+                    document.getElementById('inst-amount-paid').value = '';
+                    fetchAllData();
+                } else { Swal.fire('Error', json.message || 'Failed', 'error'); }
+            } catch(e) { Swal.fire('Error', 'Network Error', 'error'); }
+            document.getElementById('loader').style.display = 'none';
+        }
+
+        // --- 6. UTILS ---
+        async function deleteUser(id) {
+            const result = await Swal.fire({ title: 'Are you sure?', icon: 'warning', showCancelButton: true, confirmButtonText: 'Yes' });
             if (result.isConfirmed) {
                 document.getElementById('loader').style.display = 'flex';
                 await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'deleteParticipant', regId: id }) });
                 fetchAllData();
-                Swal.fire('Deleted!', 'User has been removed.', 'success');
+                Swal.fire('Deleted!', 'User removed.', 'success');
             }
         }
 
-        // --- 6. ANNOUNCEMENT ---
         async function postAnnouncement() {
             const msg = document.getElementById('announce-msg').value;
             if(!msg) return;
@@ -415,9 +443,8 @@
             await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'postAnnouncement', message: msg }) });
             document.getElementById('loader').style.display = 'none';
             document.getElementById('announce-msg').value = '';
-            Swal.fire('Posted', 'Announcement uploaded successfully', 'success');
+            Swal.fire('Posted', 'Announcement uploaded', 'success');
         }
-
     </script>
 </body>
 </html>
