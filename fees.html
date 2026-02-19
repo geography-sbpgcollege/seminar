@@ -403,13 +403,27 @@
             if(!name || !email || !feePaid) { Swal.fire('Missing Info', 'Please fill all fields', 'warning'); return; }
 
             document.getElementById('loader').style.display = 'flex';
+            
+            // Log payload to console to ensure data is correct
+            console.log("Sending Data:", { action: 'instantRegistration', name, desig, email });
+
             const payload = { 
                 action: 'instantRegistration', 
-                name, designation: desig, email, category, feeReq, feePaid, mode 
+                name: name, 
+                designation: desig, 
+                email: email, 
+                category: category, 
+                feeReq: feeReq, 
+                feePaid: feePaid, 
+                mode: mode 
             };
 
             try {
-                const res = await fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) });
+                const res = await fetch(API_URL, { 
+                    method: 'POST', 
+                    body: JSON.stringify(payload) 
+                });
+                
                 const json = await res.json();
                 
                 if(json.success) {
@@ -420,8 +434,14 @@
                     document.getElementById('inst-email').value = '';
                     document.getElementById('inst-amount-paid').value = '';
                     fetchAllData();
-                } else { Swal.fire('Error', json.message || 'Failed', 'error'); }
-            } catch(e) { Swal.fire('Error', 'Network Error', 'error'); }
+                } else { 
+                    // CHANGE IS HERE: Show json.error if message is missing
+                    Swal.fire('Error', json.error || json.message || 'Unknown Script Error', 'error'); 
+                }
+            } catch(e) { 
+                console.error(e);
+                Swal.fire('Error', 'Network or Parsing Error: ' + e.message, 'error'); 
+            }
             document.getElementById('loader').style.display = 'none';
         }
 
